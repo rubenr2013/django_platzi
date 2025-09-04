@@ -1,0 +1,95 @@
+{% extends 'products/base.html' %}
+
+{% block title %}{{ product.title }} - Platzi Store{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <img src="{{ product.images.0 }}" class="img-fluid h-100 w-100" 
+                             alt="{{ product.title }}" 
+                             style="object-fit: cover; border-radius: 20px 0 0 20px;"
+                             onerror="this.src='https://via.placeholder.com/500x400?text=Sin+Imagen'">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body p-4 h-100 d-flex flex-column">
+                            <div class="mb-3">
+                                <span class="category-badge">{{ product.category.name }}</span>
+                            </div>
+                            
+                            <h2 class="card-title mb-3">{{ product.title }}</h2>
+                            
+                            <div class="mb-4">
+                                <span class="price-tag" style="font-size: 1.5em;">${{ product.price }}</span>
+                            </div>
+                            
+                            <div class="mb-4 flex-grow-1">
+                                <h5><i class="fas fa-info-circle text-info"></i> Descripción</h5>
+                                <p class="text-muted">{{ product.description }}</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> 
+                                    Creado: {{ product.creationAt|date:"d/m/Y H:i" }}
+                                </small><br>
+                                <small class="text-muted">
+                                    <i class="fas fa-sync"></i> 
+                                    Actualizado: {{ product.updatedAt|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                            
+                            <div class="d-flex gap-3">
+                                <a href="{% url 'product_list' %}" class="btn btn-secondary flex-fill">
+                                    <i class="fas fa-arrow-left"></i> Volver
+                                </a>
+                                <form method="post" action="{% url 'api_delete_product' product.id %}" class="flex-fill">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger w-100" 
+                                            onclick="return confirm('¿Eliminar este producto de la API?')">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información adicional -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-tag text-primary" style="font-size: 2em;"></i>
+                            <h6 class="mt-2">ID del Producto</h6>
+                            <p class="text-muted">{{ product.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-list text-warning" style="font-size: 2em;"></i>
+                            <h6 class="mt-2">Categoría ID</h6>
+                            <p class="text-muted">{{ product.category.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-images text-info" style="font-size: 2em;"></i>
+                            <h6 class="mt-2">Total Imágenes</h6>
+                            <p class="text-muted">{{ product.images|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
