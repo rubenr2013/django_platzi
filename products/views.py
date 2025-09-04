@@ -14,7 +14,7 @@ def product_list(request):
         # Obtener productos de la API de Platzi
         response = requests.get(PLATZI_API_URL, timeout=10)
         if response.status_code == 200:
-            api_products = response.json()[:20]  # Limitar a 20 productos
+            api_products = response.json()[:20] 
         else:
             api_products = []
             messages.error(request, "Error al cargar productos de la API")
