@@ -4,9 +4,70 @@
 
 {% block content %}
 <div class="container">
+    
+    <!-- Filtro por categorías -->
+    <div class="card mb-4 filter-card" style="border-radius: 20px;">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-3 text-white">
+                        <i class="fas fa-filter"></i> Filtrar por Categoría
+                    </h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="?category=all" class="btn category-filter-btn {% if current_category == 'all' %}active{% endif %} btn-sm rounded-pill">
+                            <i class="fas fa-th-large"></i> Todos
+                        </a>
+                        {% for category in all_categories %}
+                            <a href="?category={{ category }}" 
+                               class="btn category-filter-btn {% if current_category == category %}active{% endif %} btn-sm rounded-pill">
+                                <i class="fas fa-tag"></i> {{ category }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="statistics-card p-3">
+                        <div class="text-center">
+                            <div class="d-flex justify-content-center gap-3">
+                                <div class="text-center">
+                                    <span class="badge stat-badge rounded-pill px-3 py-2">{{ total_api_products }}</span>
+                                    <br><small class="text-white-50">API</small>
+                                </div>
+                                <div class="text-center">
+                                    <span class="badge stat-badge local rounded-pill px-3 py-2">{{ total_local_products }}</span>
+                                    <br><small class="text-white-50">Locales</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mostrar categoría activa -->
+    {% if current_category != 'all' %}
+        <div class="text-center mb-4">
+            <h3 class="text-white mb-3">
+                <i class="fas fa-eye"></i> 
+                Mostrando productos de: 
+            </h3>
+            <span class="current-filter-badge">{{ current_category }}</span>
+            <br>
+            <a href="?category=all" class="btn clear-filter-btn btn-sm mt-3 rounded-pill">
+                <i class="fas fa-times"></i> Limpiar filtro
+            </a>
+        </div>
+    {% endif %}
+
     <!-- Productos de la API de Platzi -->
     <h2 class="section-title">
-        <i class="fas fa-cloud"></i> Productos de Platzi API
+        <i class="fas fa-cloud"></i> 
+        Productos de Platzi API 
+        {% if current_category != 'all' %}
+            - {{ current_category }}
+        {% endif %}
+        <span class="badge bg-light text-dark ms-2">{{ total_api_products }}</span>
     </h2>
     
     {% if api_products %}
@@ -25,8 +86,14 @@
                                 <span class="category-badge">{{ product.category.name }}</span>
                             </div>
                             <div class="d-flex gap-2">
-                                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary btn-sm flex-fill">
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{% url 'edit_api_product' product.id %}" class="btn btn-warning btn-sm" title="Crear copia local para editar">
+                                    <i class="fas fa-edit"></i>
+                                    {% if product.has_local_copy %}
+                                        <small>Editado</small>
+                                    {% endif %}
                                 </a>
                                 <form method="post" action="{% url 'api_delete_product' product.id %}" class="d-inline">
                                     {% csrf_token %}
@@ -44,8 +111,17 @@
         <div class="text-center">
             <div class="card">
                 <div class="card-body">
-                    <i class="fas fa-exclamation-circle text-warning" style="font-size: 3em;"></i>
-                    <h5 class="text-muted mt-3">No se pudieron cargar los productos de la API</h5>
+                    <i class="fas fa-search text-warning" style="font-size: 3em;"></i>
+                    <h5 class="text-muted mt-3">
+                        {% if current_category == 'all' %}
+                            No se pudieron cargar los productos de la API
+                        {% else %}
+                            No hay productos de la API en la categoría "{{ current_category }}"
+                        {% endif %}
+                    </h5>
+                    {% if current_category != 'all' %}
+                        <a href="?category=all" class="btn btn-primary mt-2">Ver todos los productos</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -53,7 +129,12 @@
 
     <!-- Productos Locales -->
     <h2 class="section-title mt-5">
-        <i class="fas fa-database"></i> Productos Locales
+        <i class="fas fa-database"></i> 
+        Productos Locales
+        {% if current_category != 'all' %}
+            - {{ current_category }}
+        {% endif %}
+        <span class="badge bg-light text-dark ms-2">{{ total_local_products }}</span>
     </h2>
     
     {% if local_products %}
@@ -92,11 +173,196 @@
             <div class="card">
                 <div class="card-body">
                     <i class="fas fa-shopping-bag text-info" style="font-size: 3em;"></i>
-                    <h5 class="text-muted mt-3">No hay productos locales</h5>
-                    <p class="text-muted">Crea tu primer producto haciendo clic en el botón "+"</p>
+                    <h5 class="text-muted mt-3">
+                        {% if current_category == 'all' %}
+                            No hay productos locales
+                        {% else %}
+                            No hay productos locales en la categoría "{{ current_category }}"
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted">
+                        {% if current_category == 'all' %}
+                            Crea tu primer producto haciendo clic en el botón "+"
+                        {% else %}
+                            <a href="?category=all" class="btn btn-primary">Ver todos los productos</a>
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>
     {% endif %}
 </div>
+
+<style>
+.filter-card {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.category-filter-btn {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease;
+}
+
+.category-filter-btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+}
+
+.category-filter-btn.active {
+    background: linear-gradient(45deg, #667eea, #f093fb) !important;
+    border-color: #f093fb !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+.category-filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.category-filter-btn:hover::before {
+    left: 100%;
+}
+
+.statistics-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-badge {
+    background: linear-gradient(45deg, #4ecdc4, #26d0ce) !important;
+    animation: pulse 2s infinite;
+    color: white !important;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.stat-badge.local {
+    background: linear-gradient(45deg, #ffe066, #ffd54f) !important;
+    color: #333 !important;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.current-filter-badge {
+    background: linear-gradient(45deg, #f093fb, #667eea);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1.2em;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    text-transform: capitalize;
+}
+
+.clear-filter-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.clear-filter-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+/* Efectos adicionales para las cards */
+.card {
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+
+.card:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(45deg) translate(-100%, -100%); }
+    100% { transform: rotate(45deg) translate(100%, 100%); }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .category-filter-btn {
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+    
+    .statistics-card {
+        margin-top: 15px;
+    }
+    
+    .current-filter-badge {
+        font-size: 1em;
+        padding: 8px 16px;
+    }
+}
+</style>
+
+<!-- Script para mejorar la experiencia de usuario -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Añadir efecto de loading al hacer clic en filtros
+    const filterButtons = document.querySelectorAll('.category-filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Mostrar estado de carga
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            
+            // Restaurar después de un delay (el navegador ya habrá iniciado la navegación)
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 100);
+        });
+    });
+    
+    // Animación suave para las estadísticas
+    const statBadges = document.querySelectorAll('.stat-badge');
+    statBadges.forEach((badge, index) => {
+        badge.style.animationDelay = `${index * 0.2}s`;
+    });
+});
+</script>
 {% endblock %}
