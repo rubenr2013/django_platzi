@@ -252,6 +252,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'product_list' %}">
                             <i class="fas fa-home"></i> Inicio
                         </a>
@@ -261,6 +266,7 @@
                             <i class="fas fa-plus"></i> Crear Producto
                         </a>
                     </li>
+
                 </ul>
             </div>
         </div>
