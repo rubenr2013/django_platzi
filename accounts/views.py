@@ -223,7 +223,7 @@ def register_view(request):
     """
     if request.user.is_authenticated:
         messages.info(request, 'Ya tienes una sesión activa.')
-        return redirect('products:product_list')
+        return redirect('product_list')  # ✅ CORREGIDO: Removido 'products:'
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -260,18 +260,17 @@ def register_view(request):
                             email=user_data['email'],
                             first_name=user_data['first_name'],
                             last_name=user_data['last_name'],
-                            password=user_data['password'],
-                            password2=user_data['password2']
+                            password=user_data['password']
                         )
                         messages.success(
                             request, 
                             f'¡Registro exitoso! Bienvenido {user.first_name}. Tu cuenta ha sido creada.'
                         )
-                        return redirect('accounts:login')
+                        return redirect('login')  # ✅ CORREGIDO: Removido 'accounts:'
                     
                     except Exception as e:
                         messages.error(request, 'Error al crear usuario local. Intenta iniciar sesión.')
-                        return redirect('accounts:login')
+                        return redirect('login')  # ✅ CORREGIDO: Removido 'accounts:'
                         
                 elif response.status_code == 400:
                     # Error en el registro - procesar errores específicos
@@ -307,7 +306,7 @@ def login_view(request):
     """
     if request.user.is_authenticated:
         messages.info(request, 'Ya tienes una sesión activa.')
-        return redirect('products:product_list')
+        return redirect('product_list')  # ✅ CORREGIDO: Removido 'products:'
     
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
@@ -353,7 +352,7 @@ def login_view(request):
                             request.session['refresh_token'] = response_data.get('refresh_token', '')
                         
                         # Redirigir a donde el usuario quería ir originalmente
-                        next_url = request.GET.get('next', 'products:product_list')
+                        next_url = request.GET.get('next', 'product_list')  # ✅ CORREGIDO: Removido 'products:'
                         return redirect(next_url)
                     else:
                         # El usuario existe en la API pero no localmente, crearlo
@@ -382,7 +381,7 @@ def login_view(request):
                                 request.session['api_token'] = response_data['access_token']
                                 request.session['refresh_token'] = response_data.get('refresh_token', '')
                             
-                            next_url = request.GET.get('next', 'products:product_list')
+                            next_url = request.GET.get('next', 'product_list')  # ✅ CORREGIDO: Removido 'products:'
                             return redirect(next_url)
                             
                         except Exception as e:
@@ -442,4 +441,4 @@ def logout_view(request):
     else:
         messages.success(request, 'Has cerrado sesión exitosamente.')
     
-    return redirect('accounts:login')
+    return redirect('login')  # ✅ CORREGIDO: Removido 'accounts:'
