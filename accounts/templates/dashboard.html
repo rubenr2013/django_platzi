@@ -1,0 +1,400 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Dashboard - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    #Header del Dashboard
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-header">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar-large me-3">
+                                    {% if user.first_name and user.last_name %}
+                                        {{ user.first_name.0 }}{{ user.last_name.0 }}
+                                    {% elif user.first_name %}
+                                        {{ user.first_name.0 }}{{ user.username.1|default:'U' }}
+                                    {% else %}
+                                        {{ user.username.0 }}{{ user.username.1|default:'U' }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h2 class="mb-1">¡Hola, {{ user.first_name|default:user.username }}!</h2>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-calendar"></i> Miembro desde {{ user.date_joined|date:"F Y" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="welcome-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-clock text-primary"></i>
+                                    <small>Último acceso: {{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    #Estadísticas principales
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3 class="stats-number">{{ user_products_count }}</h3>
+                    <p class="stats-label">Productos Creados</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3 class="stats-number">{{ edited_products_count }}</h3>
+                    <p class="stats-label">Productos Editados</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 class="stats-number">{{ total_views }}</h3>
+                    <p class="stats-label">Visualizaciones</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-icon mb-3">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="stats-number">{{ favorite_products_count }}</h3>
+                    <p class="stats-label">Favoritos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    #Acciones rápidas
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt"></i> Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'create_product' %}" class="quick-action-btn">
+                                <i class="fas fa-plus"></i>
+                                <span>Crear Producto</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'product_list' %}" class="quick-action-btn">
+                                <i class="fas fa-list"></i>
+                                <span>Ver Productos</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'profile_settings' %}" class="quick-action-btn">
+                                <i class="fas fa-cog"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'profile' %}" class="quick-action-btn">
+                                <i class="fas fa-user"></i>
+                                <span>Mi Perfil</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    #Productos recientes
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-clock"></i> Productos Recientes</h5>
+                    <a href="{% url 'product_list' %}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_products %}
+                        {% for product in recent_products %}
+                        <div class="recent-product-item">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ product.image }}" class="recent-product-img" alt="{{ product.title }}">
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">{{ product.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar"></i> {{ product.created_at|date:"d/m/Y H:i" }}
+                                        <span class="ms-3">
+                                            <i class="fas fa-tag"></i> {{ product.category }}
+                                        </span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="price-tag-small">${{ product.price }}</span>
+                                    <div class="mt-1">
+                                        <a href="{% url 'update_product' product.id %}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox text-muted" style="font-size: 3em;"></i>
+                            <h5 class="text-muted mt-3">No has creado productos aún</h5>
+                            <p class="text-muted">Crea tu primer producto para comenzar</p>
+                            <a href="{% url 'create_product' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Producto
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Resumen por Categorías</h5>
+                </div>
+                <div class="card-body">
+                    {% if category_stats %}
+                        {% for stat in category_stats %}
+                        <div class="category-stat-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="category-name">{{ stat.category }}</span>
+                                <span class="category-count">{{ stat.count }}</span>
+                            </div>
+                            <div class="progress mt-1">
+                                <div class="progress-bar" style="width: {{ stat.percentage }}%"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-chart-pie text-muted" style="font-size: 2em;"></i>
+                            <p class="text-muted mt-2">Sin datos de categorías</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.user-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 2em;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.stats-card {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: white;
+    font-size: 1.5em;
+}
+
+.stats-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 10px 0 5px 0;
+}
+
+.stats-label {
+    color: var(--text-color);
+    font-weight: 500;
+    margin: 0;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 15px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.quick-action-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-3px);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.quick-action-btn i {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.quick-action-btn span {
+    font-weight: 600;
+}
+
+.recent-product-item {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.recent-product-item:last-child {
+    border-bottom: none;
+}
+
+.recent-product-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.price-tag-small {
+    background: linear-gradient(45deg, var(--success-color), #26d0ce);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.category-stat-item {
+    position: relative;
+}
+
+.category-name {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.category-count {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.progress {
+    height: 6px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 3px;
+}
+
+.progress-bar {
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    border-radius: 3px;
+}
+
+.welcome-stats {
+    text-align: right;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    color: var(--text-color);
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stats-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.stats-card:nth-child(1) { animation-delay: 0.1s; }
+.stats-card:nth-child(2) { animation-delay: 0.2s; }
+.stats-card:nth-child(3) { animation-delay: 0.3s; }
+.stats-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Dark mode adjustments */
+[data-theme="dark"] .recent-product-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .progress {
+    background: rgba(255, 255, 255, 0.1);
+}

@@ -23,6 +23,12 @@ from .serializers import (
     UserSerializer
 )
 
+# Nuevas importaciones para las funcionalidades adicionales
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.db.models import Count
+from django.core.paginator import Paginator
 
 # URL base de tu API (configurable desde settings)
 API_BASE_URL = "http://127.0.0.1:8000/api/"
@@ -223,7 +229,7 @@ def register_view(request):
     """
     if request.user.is_authenticated:
         messages.info(request, 'Ya tienes una sesión activa.')
-        return redirect('product_list')  # ✅ CORREGIDO: Removido 'products:'
+        return redirect('product_list')
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -266,11 +272,11 @@ def register_view(request):
                             request, 
                             f'¡Registro exitoso! Bienvenido {user.first_name}. Tu cuenta ha sido creada.'
                         )
-                        return redirect('login')  # ✅ CORREGIDO: Removido 'accounts:'
+                        return redirect('login')
                     
                     except Exception as e:
                         messages.error(request, 'Error al crear usuario local. Intenta iniciar sesión.')
-                        return redirect('login')  # ✅ CORREGIDO: Removido 'accounts:'
+                        return redirect('login')
                         
                 elif response.status_code == 400:
                     # Error en el registro - procesar errores específicos
@@ -306,7 +312,7 @@ def login_view(request):
     """
     if request.user.is_authenticated:
         messages.info(request, 'Ya tienes una sesión activa.')
-        return redirect('product_list')  # ✅ CORREGIDO: Removido 'products:'
+        return redirect('product_list')
     
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
@@ -352,7 +358,7 @@ def login_view(request):
                             request.session['refresh_token'] = response_data.get('refresh_token', '')
                         
                         # Redirigir a donde el usuario quería ir originalmente
-                        next_url = request.GET.get('next', 'product_list')  # ✅ CORREGIDO: Removido 'products:'
+                        next_url = request.GET.get('next', 'product_list')
                         return redirect(next_url)
                     else:
                         # El usuario existe en la API pero no localmente, crearlo
@@ -381,7 +387,7 @@ def login_view(request):
                                 request.session['api_token'] = response_data['access_token']
                                 request.session['refresh_token'] = response_data.get('refresh_token', '')
                             
-                            next_url = request.GET.get('next', 'product_list')  # ✅ CORREGIDO: Removido 'products:'
+                            next_url = request.GET.get('next', 'product_list')
                             return redirect(next_url)
                             
                         except Exception as e:
@@ -441,4 +447,164 @@ def logout_view(request):
     else:
         messages.success(request, 'Has cerrado sesión exitosamente.')
     
-    return redirect('login')  # ✅ CORREGIDO: Removido 'accounts:'
+    return redirect('login')
+
+
+# NUEVAS VISTAS PARA DASHBOARD, PERFIL Y CONFIGURACIÓN
+
+@login_required
+def dashboard(request):
+    """
+    Vista del dashboard del usuario con estadísticas personalizadas
+    """
+    try:
+        # Intentar importar el modelo de productos
+        from products.models import Product
+        
+        # Buscar productos del usuario - ajustar según tu modelo
+        if hasattr(Product, 'created_by'):
+            user_products = Product.objects.filter(created_by=request.user)
+        elif hasattr(Product, 'user'):
+            user_products = Product.objects.filter(user=request.user)
+        else:
+            # Si no hay campo de usuario, mostrar todos o ninguno
+            user_products = Product.objects.none()
+        
+    except ImportError:
+        # Si no existe el modelo Product, usar datos mock
+        user_products = []
+    
+    # Estadísticas básicas
+    user_products_count = len(user_products) if hasattr(user_products, '__len__') else user_products.count()
+    edited_products_count = user_products_count  # Puedes ajustar esto según tu lógica
+    total_views = user_products_count * 15  # Mock data
+    favorite_products_count = user_products_count // 2  # Mock data
+    
+    # Productos recientes (últimos 5)
+    recent_products = user_products[:5] if hasattr(user_products, '__getitem__') else list(user_products[:5])
+    
+    # Estadísticas por categoría
+    category_stats = []
+    if user_products_count > 0:
+        try:
+            categories = user_products.values('category').annotate(count=Count('category')).order_by('-count')
+            total = user_products_count
+            
+            for cat in categories:
+                percentage = (cat['count'] / total) * 100
+                category_stats.append({
+                    'category': cat['category'],
+                    'count': cat['count'],
+                    'percentage': percentage
+                })
+        except:
+            # Mock data si hay error
+            category_stats = [
+                {'category': 'Electronics', 'count': user_products_count // 2, 'percentage': 50},
+                {'category': 'Clothing', 'count': user_products_count // 3, 'percentage': 30},
+                {'category': 'Books', 'count': user_products_count // 5, 'percentage': 20},
+            ]
+    
+    context = {
+        'user_products_count': user_products_count,
+        'edited_products_count': edited_products_count,
+        'total_views': total_views,
+        'favorite_products_count': favorite_products_count,
+        'recent_products': recent_products,
+        'category_stats': category_stats,
+    }
+    
+    return render(request, 'accounts/dashboard.html', context)
+
+
+@login_required
+def profile(request):
+    """
+    Vista del perfil del usuario
+    """
+    try:
+        from products.models import Product
+        
+        # Productos del usuario
+        if hasattr(Product, 'created_by'):
+            user_products = Product.objects.filter(created_by=request.user)[:6]
+        elif hasattr(Product, 'user'):
+            user_products = Product.objects.filter(user=request.user)[:6]
+        else:
+            user_products = []
+        
+        user_products_count = len(user_products) if hasattr(user_products, '__len__') else user_products.count()
+        
+    except ImportError:
+        user_products = []
+        user_products_count = 0
+    
+    edited_count = user_products_count  # Ajustar según tu lógica
+    
+    context = {
+        'user_products': user_products,
+        'user_products_count': user_products_count,
+        'edited_count': edited_count,
+    }
+    
+    return render(request, 'accounts/profile.html', context)
+
+
+@login_required
+def profile_settings(request):
+    """
+    Vista para configuración del perfil
+    """
+    try:
+        from products.models import Product
+        
+        if hasattr(Product, 'created_by'):
+            user_products_count = Product.objects.filter(created_by=request.user).count()
+        elif hasattr(Product, 'user'):
+            user_products_count = Product.objects.filter(user=request.user).count()
+        else:
+            user_products_count = 0
+            
+    except ImportError:
+        user_products_count = 0
+    
+    if request.method == 'POST':
+        # Actualizar información del usuario
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        
+        try:
+            user.save()
+            messages.success(request, 'Tu información ha sido actualizada correctamente.')
+        except Exception as e:
+            messages.error(request, 'Error al actualizar la información. Intenta nuevamente.')
+        
+        return redirect('profile_settings')
+    
+    context = {
+        'user_products_count': user_products_count,
+    }
+    
+    return render(request, 'accounts/profile_settings.html', context)
+
+
+@login_required
+def change_password(request):
+    """
+    Vista para cambiar contraseña
+    """
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Importante para mantener la sesión
+            messages.success(request, 'Tu contraseña ha sido cambiada exitosamente.')
+            return redirect('profile_settings')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{error}')
+    
+    return redirect('profile_settings')

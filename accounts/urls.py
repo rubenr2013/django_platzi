@@ -1,15 +1,25 @@
 from django.urls import path
 from . import views
 
-app_name = 'accounts'
+# ELIMINAR app_name para evitar problemas de namespace
+# app_name = 'accounts'
 
 urlpatterns = [
+    # Vistas tradicionales (sin API)
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    
+    # Nuevas funcionalidades - Perfil y Dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('profile/', views.profile, name='profile'),
+    path('settings/', views.profile_settings, name='profile_settings'),
+    path('change-password/', views.change_password, name='change_password'),
+    
+    # API Endpoints
     path('api/register/', views.register_api, name='api_register'),
     path('api/login/', views.login_api, name='api_login'),
     path('api/logout/', views.logout_api, name='api_logout'),
     path('api/profile/', views.user_profile_api, name='api_profile'),
     path('api/check-username/', views.check_username_api, name='api_check_username'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-    path('register/', views.register_view, name='register'),
 ]

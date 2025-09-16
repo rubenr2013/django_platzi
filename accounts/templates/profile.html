@@ -1,0 +1,248 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Perfil - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            #Header del perfil
+            <div class="card profile-header-card mb-4">
+                <div class="card-body text-center">
+                    <div class="profile-avatar-large mb-3">
+                        {% if user.first_name and user.last_name %}
+                            {{ user.first_name.0 }}{{ user.last_name.0 }}
+                        {% elif user.first_name %}
+                            {{ user.first_name.0 }}{{ user.username.1|default:'U' }}
+                        {% else %}
+                            {{ user.username.0 }}{{ user.username.1|default:'U' }}
+                        {% endif %}
+                    </div>
+                    <h2>{{ user.get_full_name|default:user.username }}</h2>
+                    <p class="text-muted mb-3">@{{ user.username }}</p>
+                    <div class="profile-stats">
+                        <div class="row">
+                            <div class="col-4">
+                                <h4>{{ user_products_count }}</h4>
+                                <small>Productos</small>
+                            </div>
+                            <div class="col-4">
+                                <h4>{{ user.date_joined|timesince }}</h4>
+                                <small>Miembro</small>
+                            </div>
+                            <div class="col-4">
+                                <h4>{{ edited_count }}</h4>
+                                <small>Editados</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'profile_settings' %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            #Información del usuario
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <strong>Nombre completo:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.get_full_name|default:"No especificado" }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <strong>Email:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.email|default:"No especificado" }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <strong>Usuario desde:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.date_joined|date:"d F Y" }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <strong>Último acceso:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.last_login|date:"d F Y H:i"|default:"Nunca" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            #Productos del usuario
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-shopping-bag"></i> Mis Productos</h5>
+                    <span class="badge bg-primary">{{ user_products_count }}</span>
+                </div>
+                <div class="card-body">
+                    {% if user_products %}
+                        <div class="row">
+                            {% for product in user_products %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card product-mini-card">
+                                    <div class="row g-0">
+                                        <div class="col-4">
+                                            <img src="{{ product.image }}" class="img-fluid product-mini-img" alt="{{ product.title }}">
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="card-body p-2">
+                                                <h6 class="card-title mb-1">{{ product.title|truncatechars:25 }}</h6>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-tag"></i> {{ product.category }}
+                                                    </small>
+                                                </p>
+                                                <p class="card-text">
+                                                    <span class="price-tag-mini">${{ product.price }}</span>
+                                                </p>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{% url 'update_product' product.id %}" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ product.id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        #Paginación si es necesaria
+                        {% if user_products.paginator.num_pages > 1 %}
+                        <nav class="mt-3">
+                            <div class="text-center">
+                                <a href="{% url 'product_list' %}" class="btn btn-outline-primary">
+                                    Ver todos mis productos
+                                </a>
+                            </div>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox text-muted" style="font-size: 3em;"></i>
+                            <h5 class="text-muted mt-3">No has creado productos aún</h5>
+                            <p class="text-muted">Comienza creando tu primer producto</p>
+                            <a href="{% url 'create_product' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Producto
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+#Modal para confirmar eliminación
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro que deseas eliminar este producto? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" id="deleteForm" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-header-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 3em;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.profile-stats h4 {
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.product-mini-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.product-mini-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-mini-img {
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.price-tag-mini {
+    background: linear-gradient(45deg, var(--success-color), #26d0ce);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+</style>
+
+<script>
+function confirmDelete(productId) {
+    const form = document.getElementById('deleteForm');
+    form.action = "{% url 'delete_product' 0 %}".replace('0', productId);
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

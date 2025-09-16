@@ -1,0 +1,282 @@
+{% extends 'products/base.html' %}
+
+{% block title %}Configuración - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card settings-header mb-4">
+                <div class="card-body">
+                    <h2><i class="fas fa-cog"></i> Configuración de Cuenta</h2>
+                    <p class="text-muted">Administra tu información personal y preferencias</p>
+                </div>
+            </div>
+
+            #Formulario de información personal
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-edit"></i> Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'profile_settings' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                       value="{{ user.first_name }}" placeholder="Tu nombre">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                       value="{{ user.last_name }}" placeholder="Tu apellido">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ user.email }}" placeholder="tu@email.com">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                value="{{ user.username }}" readonly>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> El nombre de usuario no se puede cambiar
+                            </small>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            #Cambiar contraseña
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-key"></i> Cambiar Contraseña</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'change_password' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="old_password" class="form-label">Contraseña Actual</label>
+                            <input type="password" class="form-control" id="old_password" name="old_password">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password1" class="form-label">Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="new_password1" name="new_password1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password2" class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="new_password2" name="new_password2">
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Requisitos de contraseña:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Mínimo 8 caracteres</li>
+                                <li>No puede ser muy común</li>
+                                <li>No puede ser completamente numérica</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-key"></i> Cambiar Contraseña
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            #Preferencias
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-palette"></i> Preferencias</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tema</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme" id="light-theme" value="light">
+                                    <label class="form-check-label" for="light-theme">
+                                        <i class="fas fa-sun"></i> Claro
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme" id="dark-theme" value="dark">
+                                    <label class="form-check-label" for="dark-theme">
+                                        <i class="fas fa-moon"></i> Oscuro
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Notificaciones</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="notifications" checked>
+                                <label class="form-check-label" for="notifications">
+                                    Recibir notificaciones
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            #Información de cuenta
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Información de Cuenta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Fecha de registro:</strong><br>
+                            {{ user.date_joined|date:"d F Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Último acceso:</strong><br>
+                            {{ user.last_login|date:"d F Y H:i"|default:"Nunca" }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Productos creados:</strong><br>
+                            {{ user_products_count }} productos</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Estado:</strong><br>
+                            <span class="badge bg-success">Activo</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            #Zona de peligro
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Zona de Peligro</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, ten cuidado.
+                    </p>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                        <i class="fas fa-user-times"></i> Eliminar Cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+#Modal para eliminar cuenta
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Eliminar Cuenta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+                </div>
+                <p>Al eliminar tu cuenta:</p>
+                <ul>
+                    <li>Se eliminarán todos tus productos</li>
+                    <li>Perderás acceso permanentemente</li>
+                    <li>No podrás recuperar tu información</li>
+                </ul>
+                <p><strong>Escribe "ELIMINAR" para confirmar:</strong></p>
+                <input type="text" class="form-control" id="confirmDelete" placeholder="ELIMINAR">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                    Eliminar Cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.settings-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.card-header {
+    background: rgba(102, 126, 234, 0.1);
+    border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.alert-info {
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    color: var(--text-color);
+}
+</style>
+
+<script>
+// Manejar la confirmación de eliminación de cuenta
+document.getElementById('confirmDelete').addEventListener('input', function() {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (this.value === 'ELIMINAR') {
+        confirmBtn.disabled = false;
+    } else {
+        confirmBtn.disabled = true;
+    }
+});
+
+// Cargar tema actual
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.querySelector(`input[value="${savedTheme}"]`).checked = true;
+});
+
+// Guardar tema cuando cambie
+document.querySelectorAll('input[name="theme"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        localStorage.setItem('theme', this.value);
+        document.documentElement.setAttribute('data-theme', this.value);
+        
+        #Cambiar icono del toggle
+        const themeIcon = document.getElementById('theme-icon');
+        if (this.value === 'dark') {
+            themeIcon.className = 'fas fa-sun';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+        }
+    });
+});
+</script>
+{% endblock %}

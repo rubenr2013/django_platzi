@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,18 +14,36 @@
             --success-color: #4ecdc4;
             --warning-color: #ffe066;
             --danger-color: #ff6b6b;
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Modo oscuro */
+        [data-theme="dark"] {
+            --text-color: #ffffff;
+            --bg-color: #1a1a1a;
+            --card-bg: rgba(45, 45, 45, 0.95);
+            --navbar-bg: rgba(30, 30, 30, 0.95);
         }
 
         body {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
 
         .navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: var(--navbar-bg) !important;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--text-color) !important;
         }
 
         .card {
@@ -33,7 +51,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--card-bg);
             backdrop-filter: blur(10px);
         }
 
@@ -75,6 +93,132 @@
             color: #333;
         }
 
+        /* Avatar del usuario */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Dropdown personalizado */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            min-width: 250px;
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1050;
+            margin-top: 10px;
+        }
+
+        .user-dropdown:hover .user-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-dropdown-header h6 {
+            margin: 0;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .user-dropdown-header small {
+            color: rgba(var(--text-color), 0.7);
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .user-dropdown-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .user-dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        /* Toggle modo oscuro */
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Botón de login mejorado */
+        .login-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
         .product-image {
             height: 200px;
             object-fit: cover;
@@ -104,11 +248,15 @@
             border: 2px solid rgba(102, 126, 234, 0.3);
             padding: 12px 20px;
             transition: all 0.3s ease;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
 
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: var(--card-bg);
+            color: var(--text-color);
         }
 
         .alert {
@@ -150,7 +298,7 @@
             box-shadow: 0 15px 35px rgba(240, 147, 251, 0.6);
         }
 
-        /* Estilos para el filtro de categorías */
+        /* Estilos adicionales que ya tenías */
         .filter-card {
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -180,21 +328,6 @@
             transform: translateY(-2px);
         }
 
-        .category-filter-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .category-filter-btn:hover::before {
-            left: 100%;
-        }
-
         .statistics-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -207,36 +340,23 @@
             animation: pulse 2s infinite;
         }
 
-        .stat-badge.local {
-            background: linear-gradient(45deg, var(--warning-color), #ffd54f);
-        }
-
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
 
-        .current-filter-badge {
-            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-        }
-
-        .clear-filter-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            backdrop-filter: blur(10px);
-        }
-
-        .clear-filter-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        /* Responsive */
+        @media (max-width: 768px) {
+            .user-dropdown-menu {
+                min-width: 200px;
+            }
+            
+            .floating-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
         }
     </style>
 </head>
@@ -250,24 +370,83 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:login' %}">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                        </a>
-                    </li>
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'product_list' %}">
                             <i class="fas fa-home"></i> Inicio
                         </a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_product' %}">
                             <i class="fas fa-plus"></i> Crear Producto
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
+                
+                <div class="d-flex align-items-center">
+                    <!-- Toggle modo oscuro -->
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                    
+                    {% if user.is_authenticated %}
+                        <!-- Avatar y dropdown para usuario autenticado -->
+                        <div class="user-dropdown">
+                            <div class="user-avatar" title="{{ user.get_full_name|default:user.username }}">
+                                {% if user.first_name and user.last_name %}
+                                    {{ user.first_name.0 }}{{ user.last_name.0 }}
+                                {% elif user.first_name %}
+                                    {{ user.first_name.0 }}{{ user.username.1|default:'U' }}
+                                {% else %}
+                                    {{ user.username.0 }}{{ user.username.1|default:'U' }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="user-dropdown-menu">
+                                <div class="user-dropdown-header">
+                                    <h6>{{ user.get_full_name|default:user.username }}</h6>
+                                    <small>{{ user.email|default:"Usuario" }}</small>
+                                </div>
+                                
+                                <a href="{% url 'profile' %}" class="user-dropdown-item">
+                                    <i class="fas fa-user"></i> Ver Perfil
+                                </a>
+                                
+                                <a href="{% url 'dashboard' %}" class="user-dropdown-item">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                                
+                                <a href="{% url 'profile_settings' %}" class="user-dropdown-item">
+                                    <i class="fas fa-cog"></i> Configuración
+                                </a>
+                                
+                                <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 10px 0;"></div>
+                                
+                                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="user-dropdown-item">
+                                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Botones para usuario no autenticado -->
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-user-plus"></i> Registro
+                        </a>
+                        <a href="{% url 'login' %}" class="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
@@ -287,11 +466,54 @@
         {% endblock %}
     </div>
 
-    <!-- Botón flotante para crear producto -->
+    <!-- Botón flotante para crear producto (solo usuarios autenticados) -->
+    {% if user.is_authenticated %}
     <a href="{% url 'create_product' %}" class="floating-btn" title="Crear Producto">
         <i class="fas fa-plus"></i>
     </a>
+    {% endif %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Función para toggle del tema
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Cargar tema guardado al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeIcon = document.getElementById('theme-icon');
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            if (savedTheme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+            }
+        });
+
+        // Cerrar dropdown al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                // El dropdown se cierra automáticamente con CSS :hover
+            }
+        });
+    </script>
 </body>
 </html>
